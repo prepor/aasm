@@ -1,7 +1,7 @@
 module AASM
   module SupportingClasses
     class State
-      attr_reader :name, :options
+      attr_reader :name, :options, :integer
 
       def initialize(name, options={})
         @name, @options = name, options

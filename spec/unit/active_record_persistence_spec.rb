@@ -3,10 +3,13 @@ require File.join(File.dirname(__FILE__), '..', '..', 'lib', 'aasm')
 begin
   require 'rubygems'
   require 'active_record'
+  require 'spec/ar_helper'
 
   # A dummy class for mocking the activerecord connection class
+
   class Connection
   end
+
 
   class FooBar < ActiveRecord::Base
     include AASM
@@ -47,6 +50,8 @@ begin
     include AASM
     aasm_column :status
   end
+  
+
 
   class Beaver < June
   end
@@ -216,6 +221,42 @@ begin
       it "should not add a named_scope" do
         NamedScopeExample.should_not_receive(:named_scope)
         NamedScopeExample.aasm_state :new
+      end
+    end
+  end
+  
+  describe "Integers" do
+    before(:each) do
+      rebuild_models
+      @mary = Mary.create
+    end
+    it "should write states as integers" do
+      @mary.attributes['status'].should == 0
+    end
+    
+    it "should get states as symbols" do
+      @mary.aasm_current_state.should == :pending
+    end
+    
+    describe "after start" do
+      before(:each) do
+        @mary.start!
+      end
+      it "should write states as integers" do
+        @mary.attributes['status'].should == 1
+      end
+
+      it "should get states as symbols" do
+        @mary.aasm_current_state.should == :started
+      end
+    end
+    
+    describe "with named scopes" do
+      before(:each) do
+        @mary2 = Mary.create
+      end
+      it "should find all models" do
+        Mary.pending.should include(@mary, @mary2)
       end
     end
   end

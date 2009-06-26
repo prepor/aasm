@@ -88,6 +88,10 @@ module AASM
           # @aasm_column
           AASM::StateMachine[self].config.column
         end
+        
+        def aasm_integers(integers)
+          AASM::StateMachine[self].config.integers = integers
+        end
 
         def find_in_state(number, state, *args)
           with_state_scope state do
@@ -106,6 +110,17 @@ module AASM
             calculate(*args)
           end
         end
+        
+        # Get state name by integer if integers are set
+        def aasm_state_name(value)
+          AASM::StateMachine[self].config.integers && value.is_a?(Integer) ? AASM::StateMachine[self].config.integers[value] : value.to_s
+        end
+        
+        # Get state integer by symbol if integers are set
+        def aasm_state_integer(value)
+          AASM::StateMachine[self].config.integers && value.is_a?(Symbol) ? AASM::StateMachine[self].config.integers.invert[value] : value
+        end
+        
 
         protected
         def with_state_scope(state)
@@ -134,6 +149,11 @@ module AASM
         def aasm_current_state
           @current_state = aasm_read_state
         end
+        
+        def aasm_column_value
+          send(self.class.aasm_column)
+        end
+        
 
         private
 
@@ -172,7 +192,7 @@ module AASM
         #
         # NOTE: intended to be called from an event
         def aasm_write_state_without_persistence(state)
-          write_attribute(self.class.aasm_column, state.to_s)
+          write_attribute(self.class.aasm_column, self.class.aasm_state_integer(state))
         end
       end
 
@@ -189,7 +209,7 @@ module AASM
         # NOTE: intended to be called from an event
         def aasm_write_state(state)
           old_value = read_attribute(self.class.aasm_column)
-          write_attribute(self.class.aasm_column, state.to_s)
+          write_attribute(self.class.aasm_column, self.class.aasm_state_integer(state))
 
           unless self.save
             write_attribute(self.class.aasm_column, old_value)
@@ -227,18 +247,18 @@ module AASM
         #
         # This allows for nil aasm states - be sure to add validation to your model
         def aasm_read_state
-          if new_record?
-            send(self.class.aasm_column).blank? ? self.class.aasm_initial_state : send(self.class.aasm_column).to_sym
+          state = if new_record?
+            aasm_column_value.blank? ? self.class.aasm_initial_state : self.class.aasm_state_name(aasm_column_value).to_sym
           else
-            send(self.class.aasm_column).nil? ? nil : send(self.class.aasm_column).to_sym
-          end
+            aasm_column_value.nil? ? nil : self.class.aasm_state_name(aasm_column_value).to_sym
+          end          
         end
       end
 
       module NamedScopeMethods
         def aasm_state_with_named_scope name, options = {}
           aasm_state_without_named_scope name, options
-          self.named_scope name, :conditions => {self.aasm_column => name.to_s} unless self.respond_to?(name)
+          self.named_scope name, lambda { {:conditions => {self.aasm_column => self.aasm_state_integer(name)} } } unless self.respond_to?(name)
         end
       end
     end

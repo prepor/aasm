@@ -1,3 +1,44 @@
+= Fork description
+
+This fork make possible use Integer columns in AR objects (for DB perfomance).
+
+  class Mary < ActiveRecord::Base
+	  include AASM
+	  aasm_integers 0 => :pending,
+	                1 => :started,
+	                2 => :finished
+
+	  aasm_initial_state :pending
+		
+		aasm_column :status
+		
+	  aasm_state :pending
+	  aasm_state :started    
+	  aasm_state :finished
+	
+    aasm_event :start do
+      transitions :to => :started, :from => [:pending]
+    end
+  end
+	
+	mary = Mary.new
+	
+	mary.aasm_current_state  => :pending
+	mary.status  => nil
+	
+	mary.save
+	
+	mary.aasm_current_state  => :pending
+	mary.status  => 0
+	
+	mary.start!
+	
+	mary.aasm_current_state  => :started
+	mary.status  => 1
+	
+	
+Auto generated named scopes (Mary.pending, Mary.started) also works.
+
 = AASM - Ruby state machines
 
 This package contains AASM, a library for adding finite state machines to Ruby classes.
