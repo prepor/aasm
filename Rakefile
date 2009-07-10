@@ -42,7 +42,7 @@ if !defined?(Gem)
 else
   spec = Gem::Specification.new do |s|
     s.name = 'aaasm'
-    s.version = "2.0.8"
+    s.version = "2.0.9"
     s.summary = 'State machine mixin for Ruby objects'
     s.description = <<-EOF
     AASM is a continuation of the acts as state machine rails plugin, built for plain Ruby objects.
