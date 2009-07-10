@@ -6,10 +6,6 @@ module AASM
       def initialize(name, options={})
         @name, @options = name, options        
       end
-      
-      def method_name
-        
-      end
 
       def ==(state)
         if state.is_a? Symbol
