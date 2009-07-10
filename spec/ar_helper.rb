@@ -27,13 +27,9 @@ def rebuild_classes
     
     aasm_initial_state :pending
     
-    aasm_state :pending
-    aasm_state :started    
-    aasm_state :finished    
-    
-    aasm_integers 0 => :pending,
-                  1 => :started,
-                  2 => :finished
+    aasm_state :pending, :integer => 0
+    aasm_state :started, :integer => 1  
+    aasm_state :finished, :integer => 2 
                   
     aasm_event :start do
       transitions :to => :started, :from => [:pending]

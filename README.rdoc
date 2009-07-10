@@ -4,17 +4,13 @@ This fork make possible use Integer columns in AR objects (for DB perfomance).
 
   class Mary < ActiveRecord::Base
 	  include AASM
-	  aasm_integers 0 => :pending,
-	                1 => :started,
-	                2 => :finished
-
 	  aasm_initial_state :pending
 		
 		aasm_column :status
 		
-	  aasm_state :pending
-	  aasm_state :started    
-	  aasm_state :finished
+	  aasm_state :pending, :integer => 0
+	  aasm_state :started, :integer => 1   
+	  aasm_state :finished, :integer => 2
 	
     aasm_event :start do
       transitions :to => :started, :from => [:pending]
@@ -35,6 +31,9 @@ This fork make possible use Integer columns in AR objects (for DB perfomance).
 	
 	mary.aasm_current_state  => :started
 	mary.status  => 1
+	
+	# For writing conditions like { :state => Blog.aasm_integers[:closed] }
+	Mary.aasm_integers[:started] => 1
 	
 	
 Auto generated named scopes (Mary.pending, Mary.started) also works.

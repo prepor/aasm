@@ -2,6 +2,7 @@ require File.join(File.dirname(__FILE__), 'event')
 require File.join(File.dirname(__FILE__), 'state')
 require File.join(File.dirname(__FILE__), 'state_machine')
 require File.join(File.dirname(__FILE__), 'persistence')
+require File.join(File.dirname(__FILE__), 'integers')
 
 module AASM
   def self.Version

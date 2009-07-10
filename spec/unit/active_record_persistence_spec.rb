@@ -238,6 +238,11 @@ begin
       @mary.aasm_current_state.should == :pending
     end
     
+    # For writing conditions like { :state => Blog.aasm_integers[:closed] }
+    it "should get state name via []" do
+      Mary.aasm_integers[:pending].should == 0
+    end
+    
     describe "after start" do
       before(:each) do
         @mary.start!

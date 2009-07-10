@@ -88,10 +88,6 @@ module AASM
           # @aasm_column
           AASM::StateMachine[self].config.column
         end
-        
-        def aasm_integers(integers)
-          AASM::StateMachine[self].config.integers = integers
-        end
 
         def find_in_state(number, state, *args)
           with_state_scope state do
@@ -111,14 +107,18 @@ module AASM
           end
         end
         
+        def aasm_integers
+          AASM::StateMachine[self].integers
+        end
+        
         # Get state name by integer if integers are set
         def aasm_state_name(value)
-          AASM::StateMachine[self].config.integers && value.is_a?(Integer) ? AASM::StateMachine[self].config.integers[value] : value.to_s
+          aasm_integers.setted? && value.is_a?(Integer) ? aasm_integers.by_integer(value) : value.to_s
         end
         
         # Get state integer by symbol if integers are set
         def aasm_state_integer(value)
-          AASM::StateMachine[self].config.integers && value.is_a?(Symbol) ? AASM::StateMachine[self].config.integers.invert[value] : value
+          aasm_integers.setted? && value.is_a?(Symbol) ? aasm_integers.by_state(value) : value
         end
         
 
