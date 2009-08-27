@@ -20,12 +20,17 @@ module AASM
       end
       
       def execute(obj, *args)
-        case @on_transition
-        when Symbol, String
-          obj.send(@on_transition, *args)
-        when Proc
-          @on_transition.call(obj, *args)
+        success = false
+        catch(:halt) do
+          case @on_transition
+          when Symbol, String
+            obj.send(@on_transition, *args)
+          when Proc
+            @on_transition.call(obj, *args)
+          end
+          success = true
         end
+        success
       end
 
       def ==(obj)

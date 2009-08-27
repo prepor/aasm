@@ -43,6 +43,16 @@ describe AASM::SupportingClasses::StateTransition do
     st.should_not == obj
   end
 end
+describe AASM::SupportingClasses::StateTransition, '- when executing' do
+  it 'should fail if catch :halt' do
+    opts = {:from => 'foo', :to => 'bar', :on_transition => Proc.new {|o| throw :halt }}
+    st = AASM::SupportingClasses::StateTransition.new(opts)
+
+    obj = mock('object')
+
+    st.execute(obj).should == false
+  end
+end
 
 describe AASM::SupportingClasses::StateTransition, '- when performing guard checks' do
   it 'should return true of there is no guard' do
